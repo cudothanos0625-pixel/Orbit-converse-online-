@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mensagens - Orbit</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #111827;
+    color: white;
+    height: 100vh;
+}
+
+.app {
+    display: flex;
+    height: 100vh;
+}
+
+/* SERVIDORES */
+
+.servidores {
+    width: 70px;
+    background: #0b1120;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.servidor {
+    width: 48px;
+    height: 48px;
+    background: #1f2937;
+    border-radius: 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.servidor:hover {
+    background: #5865f2;
+}
+
+/* MENU */
+
+.menu {
+    width: 230px;
+    background: #18202f;
+    padding: 15px;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+.item {
+    padding: 13px;
+    margin-bottom: 6px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.item:hover {
+    background: #293449;
+}
+
+.item.ativo {
+    background: #5865f2;
+}
+
+/* CONTEÚDO */
+
+.conteudo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.header {
+    height: 65px;
+    padding: 20px;
+
+    background: #18202f;
+
+    font-size: 20px;
+    font-weight: bold;
+
+    border-bottom: 1px solid #293449;
+}
+
+/* ÁREA DAS MENSAGENS */
+
+.mensagens {
+    flex: 1;
+    padding: 20px;
+
+    overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* MENSAGEM */
+
+.mensagem {
+    background: #1f2937;
+    padding: 12px 15px;
+
+    border-radius: 10px;
+
+    max-width: 80%;
+}
+
+.mensagem strong {
+    color: #8b93ff;
+}
+
+.mensagem p {
+    margin-top: 5px;
+    color: #e5e7eb;
+}
+
+/* CAIXA DE ESCREVER */
+
+.area-enviar {
+    padding: 15px;
+
+    background: #18202f;
+
+    display: flex;
+    gap: 10px;
+}
+
+#textoMensagem {
+    flex: 1;
+
+    padding: 14px;
+
+    border: none;
+    outline: none;
+
+    border-radius: 10px;
+
+    background: #111827;
+    color: white;
+}
+
+#enviar {
+    padding: 0 20px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #5865f2;
+    color: white;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+#enviar:hover {
+    background: #4752c4;
+}
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+
+    .menu {
+        width: 180px;
+    }
+
+    .servidores {
+        width: 60px;
+    }
+
+    .servidor {
+        width: 42px;
+        height: 42px;
+    }
+
+    .mensagem {
+        max-width: 90%;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SERVIDORES -->
+
+    <div class="servidores">
+
+        <div class="servidor">🌐</div>
+
+        <div class="servidor">🎮</div>
+
+        <div class="servidor">⛏️</div>
+
+        <div class="servidor">+</div>
+
+    </div>
+
+
+    <!-- MENU -->
+
+    <div class="menu">
+
+        <div class="logo">
+            🌐 Orbit
+        </div>
+
+        <div class="item" onclick="irInicio()">
+            🏠 Início
+        </div>
+
+        <div class="item ativo">
+            💬 Mensagens
+        </div>
+
+        <div class="item" onclick="alert('Amigos em breve!')">
+            👥 Amigos
+        </div>
+
+        <div class="item" onclick="alert('Notificações em breve!')">
+            🔔 Notificações
+        </div>
+
+        <div class="item" onclick="irPerfil()">
+            👤 Perfil
+        </div>
+
+        <div class="item" onclick="alert('Configurações em breve!')">
+            ⚙️ Configurações
+        </div>
+
+    </div>
+
+
+    <!-- CONTEÚDO -->
+
+    <div class="conteudo">
+
+        <div class="header">
+            💬 Mensagens
+        </div>
+
+
+        <!-- LISTA DE MENSAGENS -->
+
+        <div
+            class="mensagens"
+            id="listaMensagens"
+        ></div>
+
+
+        <!-- ENVIAR -->
+
+        <div class="area-enviar">
+
+            <input
+                type="text"
+                id="textoMensagem"
+                placeholder="Digite uma mensagem..."
+                maxlength="500"
+            >
+
+            <button
+                id="enviar"
+                onclick="enviarMensagem()"
+            >
+                📤
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* PEGAR USUÁRIO LOGADO */
+
+function pegarUsuario() {
+
+    const emailAtual =
+        localStorage.getItem("orbit_usuario_atual");
+
+    const usuarios =
+        JSON.parse(
+            localStorage.getItem("orbit_usuarios")
+        ) || [];
+
+    const usuario =
+        usuarios.find(function(u) {
+            return u.email === emailAtual;
+        });
+
+    if (usuario) {
+        return usuario.usuario;
+    }
+
+    return "Usuário";
+}
+
+
+/* CARREGAR MENSAGENS */
+
+function carregarMensagens() {
+
+    const mensagens =
+        JSON.parse(
+            localStorage.getItem("orbit_mensagens")
+        ) || [];
+
+    const lista =
+        document.getElementById("listaMensagens");
+
+    lista.innerHTML = "";
+
+    mensagens.forEach(function(mensagem) {
+
+        const div =
+            document.createElement("div");
+
+        div.className = "mensagem";
+
+        div.innerHTML =
+            "<strong>" +
+            escapar(mensagem.usuario) +
+            "</strong>" +
+
+            "<p>" +
+            escapar(mensagem.texto) +
+            "</p>";
+
+        lista.appendChild(div);
+
+    });
+
+    lista.scrollTop = lista.scrollHeight;
+}
+
+
+/* ENVIAR MENSAGEM */
+
+function enviarMensagem() {
+
+    const input =
+        document.getElementById("textoMensagem");
+
+    const texto =
+        input.value.trim();
+
+    if (texto === "") {
+        return;
+    }
+
+    const mensagens =
+        JSON.parse(
+            localStorage.getItem("orbit_mensagens")
+        ) || [];
+
+    mensagens.push({
+
+        usuario: pegarUsuario(),
+
+        texto: texto,
+
+        data: new Date().toISOString()
+
+    });
+
+    localStorage.setItem(
+        "orbit_mensagens",
+        JSON.stringify(mensagens)
+    );
+
+    input.value = "";
+
+    carregarMensagens();
+}
+
+
+/* ENTER ENVIA */
+
+document
+    .getElementById("textoMensagem")
+    .addEventListener("keydown", function(event) {
+
+        if (event.key === "Enter") {
+            enviarMensagem();
+        }
+
+    });
+
+
+/* SEGURANÇA */
+
+function escapar(texto) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = texto;
+
+    return div.innerHTML;
+}
+
+
+/* NAVEGAÇÃO */
+
+function irInicio() {
+
+    window.location.href = "inicio.html";
+
+}
+
+function irPerfil() {
+
+    window.location.href = "inicio.html";
+
+}
+
+
+/* INICIAR */
+
+carregarMensagens();
+
+</script>
+
+</body>
+</html>

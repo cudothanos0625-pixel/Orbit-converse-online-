@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Orbit</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+/* =========================================================
+   ORBIT
+   INÍCIO COMPLETO
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #080b12;
+    --panel: #111827;
+    --panel2: #151d2d;
+    --panel3: #1c2639;
+    --border: rgba(255,255,255,.07);
+    --text: #ffffff;
+    --muted: #9ca3af;
+    --primary: #5865f2;
+    --primary-hover: #4752c4;
+    --green: #57f287;
+    --red: #ed4245;
+    --yellow: #faa61a;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+
+    background: var(--bg);
+    color: var(--text);
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    overflow: hidden;
+}
+
+button,
+input,
+textarea,
+select {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
+}
+
+
+/* =========================================================
+   APLICATIVO
+========================================================= */
+
+.app {
+    width: 100%;
+    height: 100vh;
+
+    display: flex;
+}
+
+
+/* =========================================================
+   BARRA PRINCIPAL
+========================================================= */
+
+.sidebar {
+    width: 72px;
+
+    background: #070a10;
+
+    border-right: 1px solid var(--border);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: 10px 0;
+
+    gap: 9px;
+
+    z-index: 20;
+}
+
+.logo {
+    width: 48px;
+    height: 48px;
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #5865f2,
+            #8b5cf6
+        );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 23px;
+    font-weight: bold;
+
+    margin-bottom: 5px;
+}
+
+.nav-btn {
+    width: 48px;
+    height: 48px;
+
+    border: 0;
+    border-radius: 15px;
+
+    background: #151c2b;
+
+    color: #9ca3af;
+
+    font-size: 21px;
+
+    transition: .2s;
+}
+
+.nav-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.nav-btn.active {
+    background: var(--primary);
+    color: white;
+}
+
+.nav-separator {
+    width: 32px;
+    height: 1px;
+
+    background: var(--border);
+
+    margin: 3px 0;
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 9px;
+}
+
+
+/* =========================================================
+   ÁREA PRINCIPAL
+========================================================= */
+
+.main {
+    flex: 1;
+
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    background: var(--bg);
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header {
+    height: 62px;
+
+    flex-shrink: 0;
+
+    padding: 0 18px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 15px;
+
+    background: #0d121d;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.header-title {
+    font-size: 18px;
+    font-weight: bold;
+
+    white-space: nowrap;
+}
+
+.header-search {
+    flex: 1;
+
+    max-width: 500px;
+
+    position: relative;
+}
+
+.header-search input {
+    width: 100%;
+
+    padding: 11px 15px 11px 40px;
+
+    border: 0;
+    border-radius: 9px;
+
+    background: #182235;
+
+    color: white;
+
+    outline: none;
+}
+
+.search-icon {
+    position: absolute;
+
+    left: 14px;
+    top: 10px;
+
+    color: #8d96a9;
+}
+
+.header-actions {
+    margin-left: auto;
+
+    display: flex;
+
+    gap: 7px;
+}
+
+.icon-btn {
+    width: 38px;
+    height: 38px;
+
+    border: 0;
+    border-radius: 9px;
+
+    background: transparent;
+
+    color: #9ca3af;
+
+    font-size: 19px;
+}
+
+.icon-btn:hover {
+    background: #1b2639;
+    color: white;
+}
+
+
+/* =========================================================
+   CONTEÚDO
+========================================================= */
+
+.content {
+    flex: 1;
+
+    min-height: 0;
+
+    overflow: hidden;
+}
+
+.page {
+    width: 100%;
+    height: 100%;
+
+    overflow-y: auto;
+
+    padding: 25px;
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.card {
+    background: var(--panel);
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+    padding: 18px;
+
+    margin-bottom: 16px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: bold;
+
+    margin-bottom: 15px;
+}
+
+.card-subtitle {
+    color: var(--muted);
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   INÍCIO / FEED
+========================================================= */
+
+.welcome {
+    padding: 25px;
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #1d2851,
+            #171c38,
+            #111827
+        );
+
+    margin-bottom: 20px;
+}
+
+.welcome h1 {
+    margin: 0 0 8px;
+
+    font-size: 28px;
+}
+
+.welcome p {
+    margin: 0;
+
+    color: #c2c7d0;
+}
+
+.create-post {
+    display: flex;
+    gap: 12px;
+
+    align-items: flex-start;
+}
+
+.big-avatar {
+    width: 45px;
+    height: 45px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #5865f2,
+            #8b5cf6
+        );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: bold;
+}
+
+.create-post-box {
+    flex: 1;
+}
+
+.create-post-input {
+    width: 100%;
+
+    min-height: 55px;
+
+    resize: none;
+
+    border: 0;
+
+    border-radius: 11px;
+
+    background: #1b2435;
+
+    color: white;
+
+    padding: 16px;
+
+    outline: none;
+}
+
+.post-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-top: 10px;
+}
+
+.small-action {
+    border: 0;
+
+    padding: 9px 12px;
+
+    border-radius: 8px;
+
+    background: #1b2639;
+
+    color: #b4bac7;
+}
+
+.small-action:hover {
+    background: #27344d;
+    color: white;
+}
+
+.publish-btn {
+    margin-left: auto;
+
+    border: 0;
+
+    padding: 10px 17px;
+
+    border-radius: 8px;
+
+    background: var(--primary);
+
+    color: white;
+
+    font-weight: bold;
+}
+
+.publish-btn:hover {
+    background: var(--primary-hover);
+}
+
+
+/* =========================================================
+   POST
+========================================================= */
+
+.post {
+    background: var(--panel);
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+    padding: 18px;
+
+    margin-bottom: 15px;
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+}
+
+.post-user {
+    font-weight: bold;
+}
+
+.post-time {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.post-text {
+    margin-top: 15px;
+
+    color: #d7dbe3;
+
+    line-height: 1.5;
+
+    white-space: pre-wrap;
+}
+
+.post-media {
+    margin-top: 14px;
+
+    width: 100%;
+
+    max-height: 500px;
+
+    object-fit: cover;
+
+    border-radius: 10px;
+}
+
+.post-buttons {
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 15px;
+
+    border-top: 1px solid var(--border);
+
+    padding-top: 12px;
+}
+
+.post-button {
+    border: 0;
+
+    background: transparent;
+
+    color: #9ca3af;
+
+    padding: 8px 12px;
+
+    border-radius: 8px;
+}
+
+.post-button:hover {
+    background: #1c273b;
+    color: white;
+}
+
+
+/* =========================================================
+   AMIGOS
+========================================================= */
+
+.friend-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(240px, 1fr)
+        );
+
+    gap: 12px;
+}
+
+.friend-card {
+    background: var(--panel);
+
+    border: 1px solid var(--border);
+
+    border-radius: 13px;
+
+    padding: 15px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+.friend-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.friend-name {
+    font-weight: bold;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.online {
+    color: var(--green);
+
+    font-size: 12px;
+
+    margin-top: 4px;
+}
+
+.offline {
+    color: #72798a;
+
+    font-size: 12px;
+
+    margin-top: 4px;
+}
+
+.friend-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.friend-btn {
+    width: 34px;
+    height: 34px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    background: #1d2940;
+
+    color: white;
+}
+
+.friend-btn:hover {
+    background: var(--primary);
+}
+
+
+/* =========================================================
+   SOLICITAÇÕES
+========================================================= */
+
+.request {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 13px;
+
+    background: #151e2f;
+
+    border-radius: 10px;
+
+    margin-bottom: 8px;
+}
+
+.request-info {
+    flex: 1;
+}
+
+.request-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.accept {
+    border: 0;
+
+    background: var(--green);
+
+    color: #08120b;
+
+    padding: 8px 11px;
+
+    border-radius: 7px;
+
+    font-weight: bold;
+}
+
+.reject {
+    border: 0;
+
+    background: #273044;
+
+    color: white;
+
+    padding: 8px 11px;
+
+    border-radius: 7px;
+}
+
+
+/* =========================================================
+   MENSAGENS PRIVADAS
+========================================================= */
+
+.dm-layout {
+    height: 100%;
+
+    display: flex;
+}
+
+.dm-list {
+    width: 280px;
+
+    flex-shrink: 0;
+
+    background: #0f1522;
+
+    border-right: 1px solid var(--border);
+
+    overflow-y: auto;
+}
+
+.dm-list-title {
+    padding: 18px;
+
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.dm-search {
+    margin: 0 12px 12px;
+
+    width: calc(100% - 24px);
+
+    padding: 10px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    background: #1a2436;
+
+    color: white;
+
+    outline: none;
+}
+
+.dm-user {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 11px 14px;
+
+    cursor: pointer;
+}
+
+.dm-user:hover,
+.dm-user.active {
+    background: #1c2940;
+}
+
+.dm-name {
+    flex: 1;
+
+    font-weight: bold;
+}
+
+.dm-chat {
+    flex: 1;
+
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.dm-header {
+    height: 60px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 0 18px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.dm-messages {
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding: 20px;
+}
+
+.dm-form {
+    display: flex;
+
+    gap: 10px;
+
+    padding: 15px;
+}
+
+.dm-input {
+    flex: 1;
+
+    padding: 13px;
+
+    border: 0;
+
+    border-radius: 9px;
+
+    background: #1a2436;
+
+    color: white;
+
+    outline: none;
+}
+
+
+/* =========================================================
+   CRIAR CONTEÚDO
+========================================================= */
+
+.creator {
+    max-width: 800px;
+
+    margin: auto;
+}
+
+.creator textarea {
+    width: 100%;
+
+    min-height: 180px;
+
+    resize: vertical;
+
+    padding: 15px;
+
+    border: 0;
+
+    border-radius: 10px;
+
+    background: #182235;
+
+    color: white;
+
+    outline: none;
+
+    font-size: 15px;
+}
+
+.creator input {
+    width: 100%;
+
+    padding: 13px;
+
+    margin-bottom: 12px;
+
+    border: 0;
+
+    border-radius: 9px;
+
+    background: #182235;
+
+    color: white;
+
+    outline: none;
+}
+
+.creator-preview {
+    margin-top: 15px;
+}
+
+.creator-preview img,
+.creator-preview video {
+    max-width: 100%;
+
+    max-height: 400px;
+
+    border-radius: 10px;
+}
+
+
+/* =========================================================
+   NOTIFICAÇÕES
+========================================================= */
+
+.notification {
+    display: flex;
+
+    gap: 12px;
+
+    padding: 14px;
+
+    background: var(--panel);
+
+    border: 1px solid var(--border);
+
+    border-radius: 11px;
+
+    margin-bottom: 8px;
+}
+
+.notification.unread {
+    border-left:
+        3px solid var(--primary);
+}
+
+.notification-text {
+    flex: 1;
+
+    color: #d1d5db;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   PERFIL
+========================================================= */
+
+.profile-cover {
+    height: 180px;
+
+    border-radius: 15px 15px 0 0;
+
+    background:
+        linear-gradient(
+            135deg,
+            #5865f2,
+            #8b5cf6,
+            #1d4ed8
+        );
+
+    position: relative;
+}
+
+.profile-card {
+    background: var(--panel);
+
+    border-radius: 0 0 15px 15px;
+
+    padding: 0 22px 22px;
+
+    margin-bottom: 20px;
+}
+
+.profile-avatar {
+    width: 95px;
+    height: 95px;
+
+    border-radius: 50%;
+
+    border: 6px solid var(--panel);
+
+    background: #5865f2;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 30px;
+    font-weight: bold;
+
+    margin-top: -47px;
+
+    position: relative;
+}
+
+.profile-name {
+    margin-top: 10px;
+
+    font-size: 24px;
+
+    font-weight: bold;
+}
+
+.profile-bio {
+    margin-top: 8px;
+
+    color: #9ca3af;
+}
+
+
+/* =========================================================
+   PESQUISA
+========================================================= */
+
+.search-results {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.search-result {
+    background: var(--panel);
+
+    border: 1px solid var(--border);
+
+    border-radius: 11px;
+
+    padding: 13px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+/* =========================================================
+   CONFIGURAÇÕES
+========================================================= */
+
+.settings-layout {
+    display: flex;
+
+    gap: 20px;
+
+    max-width: 950px;
+
+    margin: auto;
+}
+
+.settings-menu {
+    width: 200px;
+}
+
+.settings-menu button {
+    width: 100%;
+
+    padding: 11px;
+
+    margin-bottom: 4px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #9ca3af;
+
+    text-align: left;
+}
+
+.settings-menu button:hover,
+.settings-menu button.active {
+    background: #1b263b;
+    color: white;
+}
+
+.settings-content {
+    flex: 1;
+}
+
+.setting-row {
+    padding: 15px 0;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.setting-row:last-child {
+    border-bottom: 0;
+}
+
+.setting-label {
+    font-weight: bold;
+
+    margin-bottom: 6px;
+}
+
+.setting-description {
+    color: #8d96a9;
+
+    font-size: 13px;
+}
+
+.setting-input {
+    width: 100%;
+
+    margin-top: 10px;
+
+    padding: 12px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    background: #182235;
+
+    color: white;
+
+    outline: none;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,.7);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    z-index: 100;
+}
+
+.modal-box {
+    width: min(500px, calc(100% - 30px));
+
+    background: #141d2d;
+
+    border: 1px solid var(--border);
+
+    border-radius: 15px;
+
+    padding: 22px;
+
+    box-shadow:
+        0 20px 70px rgba(0,0,0,.5);
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: bold;
+
+    margin-bottom: 17px;
+}
+
+.modal input,
+.modal textarea {
+    width: 100%;
+
+    padding: 13px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    background: #0f1726;
+
+    color: white;
+
+    outline: none;
+
+    margin-bottom: 10px;
+}
+
+.modal-buttons {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 8px;
+
+    margin-top: 10px;
+}
+
+
+/* =========================================================
+   BOTÕES
+========================================================= */
+
+.primary {
+    border: 0;
+
+    background: var(--primary);
+
+    color: white;
+
+    padding: 10px 15px;
+
+    border-radius: 8px;
+
+    font-weight: bold;
+}
+
+.primary:hover {
+    background: var(--primary-hover);
+}
+
+.secondary {
+    border: 0;
+
+    background: #273044;
+
+    color: white;
+
+    padding: 10px 15px;
+
+    border-radius: 8px;
+}
+
+.danger {
+    border: 0;
+
+    background: var(--red);
+
+    color: white;
+
+    padding: 10px 15px;
+
+    border-radius: 8px;
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+.toast {
+    position: fixed;
+
+    right: 20px;
+    bottom: 20px;
+
+    max-width: 320px;
+
+    background: #182235;
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    padding: 13px 16px;
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,.4);
+
+    z-index: 200;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 850px) {
+
+    .sidebar {
+        width: 60px;
+    }
+
+    .nav-btn,
+    .logo {
+        width: 43px;
+        height: 43px;
+    }
+
+    .page {
+        padding: 15px;
+    }
+
+    .dm-list {
+        width: 190px;
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    .sidebar {
+        position: fixed;
+
+        bottom: 0;
+        left: 0;
+
+        width: 100%;
+        height: 62px;
+
+        flex-direction: row;
+
+        justify-content: center;
+
+        background: #080b12;
+
+        border-top: 1px solid var(--border);
+
+        border-right: 0;
+
+        padding: 5px;
+
+        z-index: 50;
+    }
+
+    .logo,
+    .nav-separator,
+    .sidebar-bottom {
+        display: none;
+    }
+
+    .main {
+        height: calc(100vh - 62px);
+    }
+
+    .nav-btn {
+        width: 43px;
+        height: 43px;
+    }
+
+    .header-title {
+        display: none;
+    }
+
+    .header {
+        height: 55px;
+    }
+
+    .header-search {
+        max-width: none;
+    }
+
+    .friend-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dm-list {
+        width: 80px;
+    }
+
+    .dm-name {
+        display: none;
+    }
+
+}
+
+
+/* =========================================================
+   CARREGAMENTO
+========================================================= */
+
+.loading {
+    min-height: 200px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: #8d96a9;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+    <!-- =====================================================
+         NAVEGAÇÃO
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            O
+        </div>
+
+
+        <button
+            class="nav-btn active"
+            onclick="showPage('home')"
+            title="Início"
+        >
+            🏠
+        </button>
+
+
+        <button
+            class="nav-btn"
+            onclick="showPage('friends')"
+            title="Amigos"
+        >
+            👥
+        </button>
+
+
+        <button
+            class="nav-btn"
+            onclick="showPage('messages')"
+            title="Mensagens"
+        >
+            💬
+        </button>
+
+
+        <button
+            class="nav-btn"
+            onclick="showPage('create')"
+            title="Criar conteúdo"
+        >
+            ➕
+        </button>
+
+
+        <button
+            class="nav-btn"
+            onclick="showPage('communities')"
+            title="Comunidades"
+        >
+            🌐
+        </button>
+
+
+        <button
+            class="nav-btn"
+            onclick="showPage('notifications')"
+            title="Notificações"
+        >
+            🔔
+        </button>
+
+
+        <div class="nav-separator"></div>
+
+
+        <button
+            class="nav-btn"
+            onclick="showPage('profile')"
+            title="Perfil"
+        >
+            👤
+        </button>
+
+
+        <div class="sidebar-bottom">
+
+            <button
+                class="nav-btn"
+                onclick="showPage('settings')"
+                title="Configurações"
+            >
+                ⚙️
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         ÁREA PRINCIPAL
+    ====================================================== -->
+
+    <main class="main">
+
+
+        <header class="header">
+
+            <div
+                id="headerTitle"
+                class="header-title"
+            >
+                Início
+            </div>
+
+
+            <div class="header-search">
+
+                <span class="search-icon">
+                    🔍
+                </span>
+
+                <input
+                    id="globalSearch"
+                    type="text"
+                    placeholder="Pesquisar no Orbit..."
+                  
